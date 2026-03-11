@@ -74,13 +74,26 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash
             apt-get update -y
-            apt-get install nginx -y
+            apt-get install nginx awscli unzip -y
             systemctl start nginx
             systemctl enable nginx
-            # Replace default nginx page with "It works! Udagram, Udacity"
-            echo "It works! Udagram, Udacity" > /var/www/html/index.html
-        ImageId: ami-0557a15b87f6559cf  # Ubuntu 22.04 LTS in us-east-1 (Check region!)
-        KeyName: vockey  # Use 'vockey' if in Udacity labs, or your own key pair name
+            
+            # Remove the default Nginx index page
+            rm /var/www/html/index.html
+            
+            # Programmatically download the file from the S3 bucket created in this template.
+            # This loop waits until you successfully upload the index.html file to the new bucket.
+            while true; do
+                aws s3 cp s3://${WebAppBucket}/index.html /var/www/html/index.html
+                if [ $? -eq 0 ]; then
+                    echo "Successfully downloaded index.html"
+                    break
+                fi
+                echo "Waiting for index.html to be uploaded to S3..."
+                sleep 15
+            done
+        ImageId: ami-0557a15b87f6559cf  # Ubuntu 22.04 LTS in us-east-1
+        KeyName: vockey
         SecurityGroupIds:
           - !Ref WebServerSecGroup
         InstanceType: t2.micro
@@ -89,7 +102,7 @@ Resources:
         BlockDeviceMappings:
           - DeviceName: "/dev/sda1"
             Ebs:
-              VolumeSize: 10 # Rubric requires 10GB
+              VolumeSize: 10
               VolumeType: gp2
 
   # 4. LOAD BALANCER & ASG
