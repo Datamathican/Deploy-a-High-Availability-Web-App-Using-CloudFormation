@@ -5,7 +5,9 @@
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 
 **Author:** Pramod Singh  
-**Date:** March 10, 2026  
+**Date:** March 10, 2026
+
+**Live Application URL:** `http://udagra-webap-2zysdeqgci3f-1890842633.us-east-1.elb.amazonaws.com`
 
 ---
 
